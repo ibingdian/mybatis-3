@@ -48,7 +48,8 @@ public class MapperRegistry {
     }
     try {
       return mapperProxyFactory.newInstance(sqlSession);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);
     }
   }
@@ -58,6 +59,7 @@ public class MapperRegistry {
   }
 
   public <T> void addMapper(Class<T> type) {
+    // ly 过滤掉非接口的
     if (type.isInterface()) {
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
@@ -68,6 +70,8 @@ public class MapperRegistry {
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
+        //ly 加载相同路径的xml资源；
+        //   解析mapper接口的注解，比如@Select…………
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
         parser.parse();
         loadCompleted = true;
@@ -87,7 +91,7 @@ public class MapperRegistry {
   }
 
   /**
-   * @since 3.2.2
+   * @since 3.2.2  ly 扫描包下的接口和类（类会被过滤了）
    */
   public void addMappers(String packageName, Class<?> superType) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();

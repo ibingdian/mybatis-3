@@ -92,7 +92,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   private MapperMethodInvoker cachedInvoker(Object proxy, Method method, Object[] args) throws Throwable {
     try {
       return methodCache.computeIfAbsent(method, m -> {
-        if (m.isDefault()) {
+        if (m.isDefault()) { // 默认方法，接口里面可以写default方法，代理直接透传了
           try {
             if (privateLookupInMethod == null) {
               return new DefaultMethodInvoker(getMethodHandleJava8(method));
@@ -104,7 +104,8 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
             throw new RuntimeException(e);
           }
         } else {
-          return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
+          return new PlainMethodInvoker
+            (new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
         }
       });
     } catch (RuntimeException re) {

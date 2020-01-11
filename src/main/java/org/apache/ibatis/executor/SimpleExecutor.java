@@ -53,13 +53,20 @@ public class SimpleExecutor extends BaseExecutor {
     }
   }
 
+  /**
+   * 执行查询操作
+   */
   @Override
   public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      // ly
+      // 委托给StatementHandler进行处理，它是一个接口，实际创建的是 RoutingStatementHandler 对象，但它不是真实的服务对象，它是通过适配器模式找到对应的StatementHandler执行的
+      //  StatementHandler分为三种：SimpleStatementHandler、PreparedStatementHandler、CallableStatementHandler。
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
       stmt = prepareStatement(handler, ms.getStatementLog());
+      // 执行查询，用ResultHandler封装结果返回给调用者。 PreparedStatementHandler
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);
@@ -81,10 +88,16 @@ public class SimpleExecutor extends BaseExecutor {
     return Collections.emptyList();
   }
 
+  /**
+   * 初始化 Statement
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     Connection connection = getConnection(statementLog);
+    // 预编译SQL语句  BaseStatementHandler  PreparedStatementHandler
     stmt = handler.prepare(connection, transaction.getTimeout());
+    // DefaultParameterHandler
+    // 为 PreparedStatement 设置参数；找到对应的typeHandler
     handler.parameterize(stmt);
     return stmt;
   }

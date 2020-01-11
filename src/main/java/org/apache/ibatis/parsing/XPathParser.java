@@ -231,7 +231,9 @@ public class XPathParser {
     // important: this must only be called AFTER common constructor
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      //javax.xml.accessExternalSchema=all
+      //javax.xml.accessExternalDTD=all
+      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
       factory.setValidating(validation);
 
       factory.setNamespaceAware(false);
@@ -258,6 +260,7 @@ public class XPathParser {
           // NOP
         }
       });
+
       return builder.parse(inputSource);
     } catch (Exception e) {
       throw new BuilderException("Error creating document instance.  Cause: " + e, e);

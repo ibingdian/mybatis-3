@@ -44,8 +44,8 @@ public class ParamNameResolver {
    * <li>aMethod(int a, int b) -&gt; {{0, "0"}, {1, "1"}}</li>
    * <li>aMethod(int a, RowBounds rb, int b) -&gt; {{0, "0"}, {2, "1"}}</li>
    * </ul>
-   */
-  private final SortedMap<Integer, String> names;
+   */ // ly TreeMap实现了SortedMap接口，保证了有序性。默认的排序是根据key值进行升序排序，
+  private final SortedMap<Integer, String> names;// 0 ——> arg0，1 ——> arg1
 
   private boolean hasParamAnnotation;
 
@@ -119,6 +119,8 @@ public class ParamNameResolver {
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
         param.put(entry.getValue(), args[entry.getKey()]);
         // add generic param names (param1, param2, ...)
+        // param1、param2 应该是为了提供一种机制，一定有个参数可用，
+        // 不管方法里参数写什么，使用param1、param2这种形式，在xml里面都能拿到，
         final String genericParamName = GENERIC_NAME_PREFIX + (i + 1);
         // ensure not to overwrite parameter named with @Param
         if (!names.containsValue(genericParamName)) {

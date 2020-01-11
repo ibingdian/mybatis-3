@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.mybatis.mapper.BlogMapper">
+
+  <resultMap type="com.ly.mybatis.bean.Person" id="personMap">
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="sex" property="sex" typeHandler="com.ly.mybatis.typehandlers.StringEnumTypeHandler"/>
+  </resultMap>
+
+  <select id="list" resultMap="personMap" parameterType="Integer">
+        select * from person where id = #{id}
+    </select>
+  <select id="list2" resultMap="personMap">
+        select * from person where id = #{arg0} and name =  #{arg1}
+    </select>
+  <insert id="add" parameterType="com.ly.mybatis.bean.Person" useGeneratedKeys="true" keyProperty="id">
+    insert into person (name,sex) values (#{name},#{sex,typeHandler=com.ly.mybatis.typehandlers.StringEnumTypeHandler})
+  </insert>
+</mapper>

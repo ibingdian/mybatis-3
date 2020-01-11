@@ -41,7 +41,7 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
   private static final long serialVersionUID = -8855120656740914948L;
 
   @Override
-  public <T> T create(Class<T> type) {
+  public <T> T create(Class<T> type) {  // 创建对象
     return create(type, null, null);
   }
 

@@ -24,6 +24,9 @@ import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.BatchResult;
 
 /**
+ *
+ * SqlSession 完全包含了面向数据库执行 SQL 命令所需的所有方法。
+ *
  * The primary Java interface for working with MyBatis.
  * Through this interface you can execute commands, get mappers and manage transactions.
  *

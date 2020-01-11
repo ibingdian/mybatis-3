@@ -26,8 +26,10 @@ import org.apache.ibatis.session.Configuration;
  * @author Clinton Begin
  */
 public class StaticSqlSource implements SqlSource {
-
+  // select * from person where id = ? and name =  ?
   private final String sql;
+  //   // ParameterMapping{property='arg0', mode=IN, javaType=class java.lang.Object, jdbcType=null, numericScale=null, resultMapId='null', jdbcTypeName='null', expression='null'}
+  //  // ParameterMapping{property='arg1', mode=IN, javaType=class java.lang.Object, jdbcType=null, numericScale=null, resultMapId='null', jdbcTypeName='null', expression='null'}
   private final List<ParameterMapping> parameterMappings;
   private final Configuration configuration;
 

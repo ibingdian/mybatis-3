@@ -30,17 +30,19 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * @author Clinton Begin
+ * ly 封装了 mapper 文件里面、操作数据库的sql语句
  */
 public final class MappedStatement {
 
   private String resource;
   private Configuration configuration;
+  // namespace+id
   private String id;
   private Integer fetchSize;
   private Integer timeout;
   private StatementType statementType;
   private ResultSetType resultSetType;
-  private SqlSource sqlSource;
+  private SqlSource sqlSource;  //  sql select * from person where id = ? and name =  ?
   private Cache cache;
   private ParameterMap parameterMap;
   private List<ResultMap> resultMaps;

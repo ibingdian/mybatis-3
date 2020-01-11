@@ -121,10 +121,12 @@ public class MapperAnnotationBuilder {
     this.configuration = configuration;
     this.type = type;
   }
-
+  // ly 解析 mapper 接口里的注解，比如，@Select……
   public void parse() {
+    // ly resource = com.ly.mybatis.mapper.BlogMapper
     String resource = type.toString();
     if (!configuration.isResourceLoaded(resource)) {
+      // ly 当解析接口的时候，会看一下有没有对应的xml文件
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
@@ -142,6 +144,7 @@ public class MapperAnnotationBuilder {
         }
       }
     }
+    // ly 解析mapper上的注解
     parsePendingMethods();
   }
 
@@ -159,12 +162,12 @@ public class MapperAnnotationBuilder {
       }
     }
   }
-
+  // 加载mapper接口对应的xml资源文件
   private void loadXmlResource() {
     // Spring may not know the real resource name so we check a flag
     // to prevent loading again a resource twice
     // this flag is set at XMLMapperBuilder#bindMapperForNamespace
-    if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
+    if (!configuration.isResourceLoaded("namespace:" + type.getName())) { // com/ly/mybatis/mapper/BlogMapper.xml
       String xmlResource = type.getName().replace('.', '/') + ".xml";
       // #1347
       InputStream inputStream = type.getResourceAsStream("/" + xmlResource);
@@ -176,7 +179,7 @@ public class MapperAnnotationBuilder {
           // ignore, resource is not required
         }
       }
-      if (inputStream != null) {
+      if (inputStream != null) { // 解析mapper的 xml文件
         XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
         xmlParser.parse();
       }

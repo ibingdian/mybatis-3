@@ -90,6 +90,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     this.parser = parser;
   }
 
+  // ly 解析全局的配置文件
+  //    配置文件里面配的属性，都会被封装在 Configuration 里面：比如 连接池、mappers、插件、typeHandler…………
+  // ly todo 我感觉最重要的事情就是：创建了连接池、获取了执行SQL
   public Configuration parse() {
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
@@ -106,16 +109,24 @@ public class XMLConfigBuilder extends BaseBuilder {
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
+      // 别名
       typeAliasesElement(root.evalNode("typeAliases"));
+      // 插件，可以在sql语句执行的过程中拦截。
       pluginElement(root.evalNode("plugins"));
       objectFactoryElement(root.evalNode("objectFactory"));
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
+      // ly 解析environments标签，创建了连接池、TransactionFactory
       environmentsElement(root.evalNode("environments"));
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+      // 类型处理器（typeHandlers）：
+      //  1、可以使用类型处理器为PreparedStatement设置参数；
+      //  2、在得到结果集的时候，使用PreparedStatement将获取到的值转变成Java类型。
       typeHandlerElement(root.evalNode("typeHandlers"));
+      // ly 解析mappers文件，获取执行sql
+      //  解析mapper文件里的sql语句，并把结果封装到MappedStatement里面
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -278,6 +289,7 @@ public class XMLConfigBuilder extends BaseBuilder {
         String id = child.getStringAttribute("id");
         if (isSpecifiedEnvironment(id)) {
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+          //  // ly 根据配置文件，创建连接池
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
           Environment.Builder environmentBuilder = new Environment.Builder(id)
@@ -312,6 +324,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (context != null) {
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
+      // jdbc -> class org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory
       TransactionFactory factory = (TransactionFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
       return factory;
@@ -323,6 +336,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (context != null) {
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
+      // pooled -> org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
       DataSourceFactory factory = (DataSourceFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
       return factory;
@@ -361,15 +375,25 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
         if ("package".equals(child.getName())) {
+          // ly 解析 mappers/package节点：
+          //    会扫描指定包下的mapper接口；
+          //    加载相同路径的xml资源；
+          //    解析mapper接口的注解，比如@Select…………
           String mapperPackage = child.getStringAttribute("name");
           configuration.addMappers(mapperPackage);
         } else {
+          // ly 解析 mappers/mapper 节点：
+          // resource、url、class，这三个属性只能配一个
+          //  resource：类路径，相对路径
+          //  url：绝对路径
+          //  class：接口
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             InputStream inputStream = Resources.getResourceAsStream(resource);
+            // 解析mapper的xml文件
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
             mapperParser.parse();
           } else if (resource == null && url != null && mapperClass == null) {

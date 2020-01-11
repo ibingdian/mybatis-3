@@ -150,6 +150,8 @@ public class Configuration {
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
+  // 代表mapper文件里的每一个sql，或注解里的sql
+  // key=namespace+id，如果key相同会报错
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
@@ -158,6 +160,7 @@ public class Configuration {
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
 
+  // loadedResources里有 interface com.ly.mybatis.mapper.BlogMapper、com/ly/mybatis/mapper/BlogMapper.xml
   protected final Set<String> loadedResources = new HashSet<>();
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers");
 
@@ -609,9 +612,11 @@ public class Configuration {
     } else {
       executor = new SimpleExecutor(this, transaction);
     }
+    // 一级缓存，默认是true，默认是开启的
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    // ly 首先会创建SimpleExecutor，之后会拿CachingExecutor和我们定义的插件Interceptor做一下包装。
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }

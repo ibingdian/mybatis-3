@@ -140,6 +140,20 @@ public class DefaultSqlSession implements SqlSession {
     return this.selectList(statement, parameter, RowBounds.DEFAULT);
   }
 
+  /**
+   * Mapper执行的过程是通过Executor、StatementHandler、ParameterHandler和ResultHandler来完成数据库操作和结果返回的，理解他们是编写插件的关键：
+   *
+   * Executor：执行器，由它统一调度其他三个对象来执行对应的SQL；
+   * StatementHandler：使用数据库的Statement执行操作；
+   * ParameterHandler：用于SQL对参数的处理；
+   * ResultHandler：进行最后数据集的封装返回处理；
+   *
+   * 在MyBatis中存在三种执行器：
+   * simple：简易执行器，默认的执行器；
+   * reuse：执行重用预处理语句；
+   * batch:执行重用语句和批量更新，针对批量专用的执行器；
+   *
+   */
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {

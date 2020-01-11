@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+<!--  如果顺序不对，会报错，要按照提示的顺序添加：typeHandlers、plugins、environments、mappers-->
+
+  <typeHandlers>
+    <typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="java.math.RoundingMode"/>
+  </typeHandlers>
+
+  <plugins>
+    <plugin interceptor="com.ly.mybatis.plugins.LogPlugin"/>
+  </plugins>
+
+  <environments default="development">
+    <!--事务管理和连接池的配置-->
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/tmp_ly?serverTimezone=UTC"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456ly"/>
+      </dataSource>
+    </environment>
+  </environments>
+
+
+<!--  这些配置会告诉了 MyBatis 去哪里找映射文件-->
+  <mappers>
+<!--   指明 mapper.xml文件在哪个包下 -->
+    <package name="com.ly.mybatis.mapper"/>
+<!--    直接指明xml文件-->
+<!--    <mapper resource="mybatis/mapper/BlogMapper.xml"/>-->
+  </mappers>
+
+</configuration>

@@ -89,13 +89,18 @@ public class XMLMapperBuilder extends BaseBuilder {
     this.resource = resource;
   }
 
+  // 解析mapper文件___标签的___属性，比如 resultMap，parameterType……，并把结果保存在 MappedStatement 里面
   public void parse() {
+    // 判断当前xml资源是否已经加载过
     if (!configuration.isResourceLoaded(resource)) {
+      // resource ： com/ly/mybatis/mapper/BlogMapper.xml
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);
+      // 绑定namespace里的接口对象
       bindMapperForNamespace();
     }
 
+    // 重新解析之前解析不了的节点
     parsePendingResultMaps();
     parsePendingCacheRefs();
     parsePendingStatements();
@@ -106,6 +111,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   private void configurationElement(XNode context) {
+    // ly 解析mapper文件，并最终封装成 MappedStatement 对象
     try {
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.equals("")) {
@@ -130,12 +136,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     buildStatementFromContext(list, null);
   }
 
+  // 解析mapper的xml里面所有的 select|insert|update|delete
   private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
     for (XNode context : list) {
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
       try {
         statementParser.parseStatementNode();
       } catch (IncompleteElementException e) {
+        // xml解析有问题，存起来，等解析完再重新解析
         configuration.addIncompleteStatement(statementParser);
       }
     }

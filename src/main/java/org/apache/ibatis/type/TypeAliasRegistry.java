@@ -34,6 +34,10 @@ import org.apache.ibatis.io.Resources;
 
 /**
  * @author Clinton Begin
+ *
+ * ly  管理 别名
+ * jdbc -> org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory
+ * pooled -> org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
  */
 public class TypeAliasRegistry {
 
