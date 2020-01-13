@@ -32,6 +32,7 @@ public class Plugin implements InvocationHandler {
 
   private final Object target;
   private final Interceptor interceptor;
+  // 保存要拦截的类及其方法
   private final Map<Class<?>, Set<Method>> signatureMap;
 
   private Plugin(Object target, Interceptor interceptor, Map<Class<?>, Set<Method>> signatureMap) {
@@ -45,7 +46,8 @@ public class Plugin implements InvocationHandler {
     Class<?> type = target.getClass();
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
     if (interfaces.length > 0) {
-      return Proxy.newProxyInstance(type.getClassLoader(),interfaces, new Plugin(target, interceptor, signatureMap));
+      return Proxy.newProxyInstance(type.getClassLoader(),interfaces,
+        new Plugin(target, interceptor, signatureMap));
     }
     return target;
   }
@@ -62,7 +64,7 @@ public class Plugin implements InvocationHandler {
       throw ExceptionUtil.unwrapThrowable(e);
     }
   }
-
+  // 获取要拦截的类及其方法
   private static Map<Class<?>, Set<Method>> getSignatureMap(Interceptor interceptor) {
     Intercepts interceptsAnnotation = interceptor.getClass().getAnnotation(Intercepts.class);
     // issue #251

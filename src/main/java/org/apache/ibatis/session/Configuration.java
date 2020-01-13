@@ -145,7 +145,9 @@ public class Configuration {
   protected Class<?> configurationFactory;
 
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
+
   protected final InterceptorChain interceptorChain = new InterceptorChain();
+
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
@@ -578,6 +580,8 @@ public class Configuration {
     return MetaObject.forObject(object, objectFactory, objectWrapperFactory, reflectorFactory);
   }
 
+
+
   public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
     ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement, parameterObject, boundSql);
     parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
@@ -595,10 +599,6 @@ public class Configuration {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
     statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
     return statementHandler;
-  }
-
-  public Executor newExecutor(Transaction transaction) {
-    return newExecutor(transaction, defaultExecutorType);
   }
 
   public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
@@ -620,6 +620,11 @@ public class Configuration {
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }
+
+  public Executor newExecutor(Transaction transaction) {
+    return newExecutor(transaction, defaultExecutorType);
+  }
+
 
   public void addKeyGenerator(String id, KeyGenerator keyGenerator) {
     keyGenerators.put(id, keyGenerator);
